@@ -4,6 +4,9 @@ PROJECT(DCMTK)
 # Minimum CMake version required
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.2)
 
+add_compile_definitions(WIN32)
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
+
 # Check the build system
 INCLUDE(CMake/dcmtkPrepare.cmake NO_POLICY_SCOPE)
 
@@ -14,9 +17,10 @@ INCLUDE(CMake/dcmtkPrepare.cmake NO_POLICY_SCOPE)
 # Modules to be built
 
 SET(DCMTK_MODULES ofstd oflog dcmdata dcmimgle
-  dcmimage dcmjpeg dcmjpls dcmtls dcmnet dcmsr
-  dcmsign dcmwlm dcmqrdb dcmpstat dcmrt dcmiod dcmfg dcmseg dcmtract dcmpmap
-  CACHE STRING "List of modules that should be built.")
+  dcmimage dcmjpeg dcmjpls CACHE STRING "list of modules that should be built.")
+  # dcmtls dcmnet dcmsr
+  # dcmsign dcmwlm dcmqrdb dcmpstat dcmrt dcmiod dcmfg dcmseg dcmtract dcmpmap
+  # CACHE STRING "List of modules that should be built.")
 
 #-----------------------------------------------------------------------------
 # Include directories
@@ -136,3 +140,5 @@ IF(CMAKE_CROSSCOMPILING)
 ENDIF(CMAKE_CROSSCOMPILING)
 
 
+SET(CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebInfo" CACHE STRING "" FORCE)
+SET(CMAKE_INSTALL_PREFIX "C:/dcmtk-static" CACHE PATH "" FORCE)

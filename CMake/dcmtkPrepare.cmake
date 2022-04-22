@@ -65,40 +65,45 @@ SET(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(BUILD_SINGLE_SHARED_LIBRARY)
 SET(CMAKE_DEBUG_POSTFIX "" CACHE STRING "Library postfix for debug builds. Usually left blank.")
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/${DCMTK_CMAKE_INCLUDE}/CMake/")
-IF(BUILD_SINGLE_SHARED_LIBRARY)
-  # When we are building a single shared lib, we are building shared libs :-)
-  SET(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
-ENDIF(BUILD_SINGLE_SHARED_LIBRARY)
+# IF(BUILD_SINGLE_SHARED_LIBRARY)
+#   # When we are building a single shared lib, we are building shared libs :-)
+#   SET(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+# ENDIF(BUILD_SINGLE_SHARED_LIBRARY)
 
 # DCMTK build options
-OPTION(DCMTK_WITH_TIFF "Configure DCMTK with support for TIFF." ON)
-OPTION(DCMTK_WITH_PNG "Configure DCMTK with support for PNG." ON)
-OPTION(DCMTK_WITH_XML "Configure DCMTK with support for XML." ON)
-OPTION(DCMTK_WITH_ZLIB "Configure DCMTK with support for ZLIB." ON)
-OPTION(DCMTK_WITH_OPENSSL "Configure DCMTK with support for OPENSSL." ON)
-OPTION(DCMTK_WITH_SNDFILE "Configure DCMTK with support for SNDFILE." ON)
-OPTION(DCMTK_WITH_ICONV "Configure DCMTK with support for ICONV." ON)
-IF(NOT WIN32)
-  OPTION(DCMTK_WITH_WRAP "Configure DCMTK with support for WRAP." ON)
-ENDIF(NOT WIN32)
-OPTION(DCMTK_ENABLE_PRIVATE_TAGS "Configure DCMTK with support for DICOM private tags coming with DCMTK." OFF)
+# OPTION(DCMTK_WITH_TIFF "Configure DCMTK with support for TIFF." ON)
+# OPTION(DCMTK_WITH_PNG "Configure DCMTK with support for PNG." ON)
+# OPTION(DCMTK_WITH_XML "Configure DCMTK with support for XML." ON)
+# OPTION(DCMTK_WITH_ZLIB "Configure DCMTK with support for ZLIB." ON)
+# OPTION(DCMTK_WITH_OPENSSL "Configure DCMTK with support for OPENSSL." ON)
+# OPTION(DCMTK_WITH_SNDFILE "Configure DCMTK with support for SNDFILE." ON)
+# OPTION(DCMTK_WITH_ICONV "Configure DCMTK with support for ICONV." ON)
+# IF(NOT WIN32)
+#   OPTION(DCMTK_WITH_WRAP "Configure DCMTK with support for WRAP." ON)
+# ENDIF(NOT WIN32)
+# OPTION(DCMTK_ENABLE_PRIVATE_TAGS "Configure DCMTK with support for DICOM private tags coming with DCMTK." OFF)
+
+# OPTION(DCMTK_WITH_DOXYGEN "Build API documentation with DOXYGEN." OFF)
+# OPTION(DCMTK_GENERATE_DOXYGEN_TAGFILE "Generate a tag file with DOXYGEN." OFF)
+# OPTION(DCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS "Build with wide char file I/O functions." OFF)
+# OPTION(DCMTK_WIDE_CHAR_MAIN_FUNCTION "Build command line tools with wide char main function." OFF)
+
 OPTION(DCMTK_WITH_THREADS "Configure DCMTK with support for multi-threading." ON)
-OPTION(DCMTK_WITH_DOXYGEN "Build API documentation with DOXYGEN." ON)
-OPTION(DCMTK_GENERATE_DOXYGEN_TAGFILE "Generate a tag file with DOXYGEN." OFF)
-OPTION(DCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS "Build with wide char file I/O functions." OFF)
-OPTION(DCMTK_WIDE_CHAR_MAIN_FUNCTION "Build command line tools with wide char main function." OFF)
 
 # Built-in (compiled-in) dictionary enabled on Windows per default, otherwise
 # disabled. Loading of external dictionary via run-time is, per default,
 # configured the the opposite way since most users won't be interested in using
 # the external default dictionary if it is already compiled in.
-IF(WIN32 OR MINGW)
-  OPTION(DCMTK_ENABLE_BUILTIN_DICTIONARY "Configure DCMTK with compiled-in data dictionary" ON)
-  OPTION(DCMTK_ENABLE_EXTERNAL_DICTIONARY "Configure DCMTK to load external dictionary from default path on startup" OFF)
-ELSE(WIN32 or MINGW) # built-in dictionary turned off on Unix per default
-  OPTION(DCMTK_ENABLE_BUILTIN_DICTIONARY "Configure DCMTK with compiled-in data dictionary" OFF)
-  OPTION(DCMTK_ENABLE_EXTERNAL_DICTIONARY "Configure DCMTK to load external dictionary from default path on startup" ON)
-ENDIF(WIN32 OR MINGW)
+SET(DCMTK_ENABLE_BUILTIN_DICTIONARY ON CACHE BOOL "" FORCE)
+SET(DCMTK_ENABLE_EXTERNAL_DICTIONARY OFF CACHE BOOL "" FORCE)
+
+# IF(WIN32 OR MINGW)
+#   OPTION(DCMTK_ENABLE_BUILTIN_DICTIONARY "Configure DCMTK with compiled-in data dictionary" ON)
+#   OPTION(DCMTK_ENABLE_EXTERNAL_DICTIONARY "Configure DCMTK to load external dictionary from default path on startup" OFF)
+# ELSE(WIN32 or MINGW) # built-in dictionary turned off on Unix per default
+#   OPTION(DCMTK_ENABLE_BUILTIN_DICTIONARY "Configure DCMTK with compiled-in data dictionary" OFF)
+#   OPTION(DCMTK_ENABLE_EXTERNAL_DICTIONARY "Configure DCMTK to load external dictionary from default path on startup" ON)
+# ENDIF(WIN32 OR MINGW)
 if (NOT DCMTK_ENABLE_EXTERNAL_DICTIONARY AND NOT DCMTK_ENABLE_BUILTIN_DICTIONARY)
   MESSAGE(WARNING "Either external or built-in dictionary should be enabled, otherwise dictionary must be loaded manually on startup!")
 ENDIF(NOT DCMTK_ENABLE_EXTERNAL_DICTIONARY AND NOT DCMTK_ENABLE_BUILTIN_DICTIONARY)
@@ -121,26 +126,26 @@ ENABLE_TESTING()
 # Include appropriate modules and set required variables for cross compiling
 #-----------------------------------------------------------------------------
 
-IF(CMAKE_CROSSCOMPILING)
-  IF(WIN32)
-    INCLUDE(${DCMTK_CMAKE_INCLUDE}CMake/dcmtkUseWine.cmake)
-    DCMTK_SETUP_WINE()
-  ELSEIF(ANDROID)
-    SET(DCMTK_TRY_COMPILE_REQUIRED_CMAKE_FLAGS "-DANDROID_TOOLCHAIN_CONFIG_FILE:INTERNAL=${ANDROID_TOOLCHAIN_CONFIG_FILE}")
-    INCLUDE(${DCMTK_CMAKE_INCLUDE}CMake/dcmtkUseAndroidSDK.cmake)
-    IF(NOT DCMTK_ANDROID_TOOLCHAIN_VERIFIED)
-      # Ensure the configuration variables for the Android device emulator exist in the cache.
-      DCMTK_SETUP_ANDROID_EMULATOR()
-      SET(DCMTK_ANDROID_TOOLCHAIN_VERIFIED TRUE CACHE INTERNAL "Set to TRUE to prevent aborting configuration on first Android toolchain run")
-      MESSAGE(FATAL_ERROR
-        "Please verify your Android toolchain configuration (e.g.\"ANDROID_NATIVE_API_LEVEL\") is correct before configuring DCMTK.\n"
-        "Hit \"Configure\" again to resume configuration when you are done.\n"
-        "NOTE: set \"DCMTK_ANDROID_TOOLCHAIN_VERIFIED\" to \"TRUE\" to avoid this check (e.g. to allow automated builds), you may use"
-        "something like\n    \"cmake -DDCMTK_ANDROID_TOOLCHAIN_VERIFIED=TRUE ...\"\nto achieve that."
-      )
-    ENDIF()
-  ENDIF()
-ENDIF(CMAKE_CROSSCOMPILING)
+# IF(CMAKE_CROSSCOMPILING)
+#   IF(WIN32)
+#     INCLUDE(${DCMTK_CMAKE_INCLUDE}CMake/dcmtkUseWine.cmake)
+#     DCMTK_SETUP_WINE()
+#   ELSEIF(ANDROID)
+#     SET(DCMTK_TRY_COMPILE_REQUIRED_CMAKE_FLAGS "-DANDROID_TOOLCHAIN_CONFIG_FILE:INTERNAL=${ANDROID_TOOLCHAIN_CONFIG_FILE}")
+#     INCLUDE(${DCMTK_CMAKE_INCLUDE}CMake/dcmtkUseAndroidSDK.cmake)
+#     IF(NOT DCMTK_ANDROID_TOOLCHAIN_VERIFIED)
+#       # Ensure the configuration variables for the Android device emulator exist in the cache.
+#       DCMTK_SETUP_ANDROID_EMULATOR()
+#       SET(DCMTK_ANDROID_TOOLCHAIN_VERIFIED TRUE CACHE INTERNAL "Set to TRUE to prevent aborting configuration on first Android toolchain run")
+#       MESSAGE(FATAL_ERROR
+#         "Please verify your Android toolchain configuration (e.g.\"ANDROID_NATIVE_API_LEVEL\") is correct before configuring DCMTK.\n"
+#         "Hit \"Configure\" again to resume configuration when you are done.\n"
+#         "NOTE: set \"DCMTK_ANDROID_TOOLCHAIN_VERIFIED\" to \"TRUE\" to avoid this check (e.g. to allow automated builds), you may use"
+#         "something like\n    \"cmake -DDCMTK_ANDROID_TOOLCHAIN_VERIFIED=TRUE ...\"\nto achieve that."
+#       )
+#     ENDIF()
+#   ENDIF()
+# ENDIF(CMAKE_CROSSCOMPILING)
 
 #-----------------------------------------------------------------------------
 # Generic utilities used for configuring DCMTK
@@ -153,34 +158,34 @@ INCLUDE(${DCMTK_CMAKE_INCLUDE}CMake/dcmtkMacros.cmake)
 # (i.e. start the emulator if required)
 #-----------------------------------------------------------------------------
 
-IF(CMAKE_CROSSCOMPILING)
-  UNSET(DCMTK_UNIT_TESTS_UNSUPPORTED_WARN_ONCE CACHE)
-  IF(ANDROID)
-    UNSET(DCMTK_TRY_RUN_ANDROID_RUNTIME_INSTALLED CACHE)
-    DCMTK_ANDROID_START_EMULATOR(DCMTK_ANDROID_EMULATOR_INSTANCE)
-    DCMTK_ATEXIT(DCMTK_ANDROID_STOP_EMULATOR DCMTK_ANDROID_EMULATOR_INSTANCE)
-  ENDIF()
-ENDIF(CMAKE_CROSSCOMPILING)
+# IF(CMAKE_CROSSCOMPILING)
+#   UNSET(DCMTK_UNIT_TESTS_UNSUPPORTED_WARN_ONCE CACHE)
+#   IF(ANDROID)
+#     UNSET(DCMTK_TRY_RUN_ANDROID_RUNTIME_INSTALLED CACHE)
+#     DCMTK_ANDROID_START_EMULATOR(DCMTK_ANDROID_EMULATOR_INSTANCE)
+#     DCMTK_ATEXIT(DCMTK_ANDROID_STOP_EMULATOR DCMTK_ANDROID_EMULATOR_INSTANCE)
+#   ENDIF()
+# ENDIF(CMAKE_CROSSCOMPILING)
 
 #-----------------------------------------------------------------------------
 # Installation sub-directories
 #-----------------------------------------------------------------------------
 
-SET(DCMTK_INSTALL_BINDIR "bin" CACHE STRING "Installation sub-directory for binary executables.")
+# SET(DCMTK_INSTALL_BINDIR "bin" CACHE STRING "Installation sub-directory for binary executables.")
 SET(DCMTK_INSTALL_INCDIR "include" CACHE STRING "Installation sub-directory for header files.")
 SET(DCMTK_INSTALL_LIBDIR "lib" CACHE STRING "Installation sub-directory for object code libraries.")
-# CMake's files (DCMTKTarget.cmake, DCMTKConfigVersion.cmake and DCMTKConfig.cmake) are installed
-# to different installation paths under Unix- and Windows-based systems
-IF(UNIX)
-  SET(DCMTK_INSTALL_CMKDIR "lib/cmake/dcmtk" CACHE STRING "Installation sub-directory for CMake files.")
-ELSEIF(WIN32)
-  SET(DCMTK_INSTALL_CMKDIR "cmake" CACHE STRING "Installation sub-directory for CMake files.")
-ENDIF(UNIX)
-SET(DCMTK_INSTALL_ETCDIR "etc/dcmtk" CACHE STRING "Installation sub-directory for configuration files.")
-SET(DCMTK_INSTALL_DATDIR "share/dcmtk" CACHE STRING "Installation sub-directory for sample files and the like.")
-SET(DCMTK_INSTALL_DOCDIR "share/doc/dcmtk" CACHE STRING "Installation sub-directory for general documentation.")
-SET(DCMTK_INSTALL_HTMDIR "share/doc/dcmtk/html" CACHE STRING "Installation sub-directory for HTML documentation.")
-SET(DCMTK_INSTALL_MANDIR "share/man" CACHE STRING "Installation sub-directory for man pages.")
+# # CMake's files (DCMTKTarget.cmake, DCMTKConfigVersion.cmake and DCMTKConfig.cmake) are installed
+# # to different installation paths under Unix- and Windows-based systems
+# IF(UNIX)
+#   SET(DCMTK_INSTALL_CMKDIR "lib/cmake/dcmtk" CACHE STRING "Installation sub-directory for CMake files.")
+# ELSEIF(WIN32)
+#   SET(DCMTK_INSTALL_CMKDIR "cmake" CACHE STRING "Installation sub-directory for CMake files.")
+# ENDIF(UNIX)
+# SET(DCMTK_INSTALL_ETCDIR "etc/dcmtk" CACHE STRING "Installation sub-directory for configuration files.")
+# SET(DCMTK_INSTALL_DATDIR "share/dcmtk" CACHE STRING "Installation sub-directory for sample files and the like.")
+# SET(DCMTK_INSTALL_DOCDIR "share/doc/dcmtk" CACHE STRING "Installation sub-directory for general documentation.")
+# SET(DCMTK_INSTALL_HTMDIR "share/doc/dcmtk/html" CACHE STRING "Installation sub-directory for HTML documentation.")
+# SET(DCMTK_INSTALL_MANDIR "share/man" CACHE STRING "Installation sub-directory for man pages.")
 
 MARK_AS_ADVANCED(DCMTK_INSTALL_BINDIR DCMTK_INSTALL_INCDIR DCMTK_INSTALL_LIBDIR DCMTK_INSTALL_CMKDIR
                  DCMTK_INSTALL_ETCDIR DCMTK_INSTALL_DATDIR DCMTK_INSTALL_DOCDIR DCMTK_INSTALL_HTMDIR
@@ -194,7 +199,7 @@ SET(DCMTK_BUILD_CMKDIR ${CMAKE_BINARY_DIR})
 #-----------------------------------------------------------------------------
 # Start with clean DCMTKTargets.cmake, filled in GenerateCMakeExports.cmake
 #-----------------------------------------------------------------------------
-FILE(WRITE ${DCMTK_BUILD_CMKDIR}/DCMTKTargets.cmake "")
+# FILE(WRITE ${DCMTK_BUILD_CMKDIR}/DCMTKTargets.cmake "")
 
 #-----------------------------------------------------------------------------
 # Platform-independent settings
@@ -212,7 +217,7 @@ IF(COMMAND CMAKE_POLICY)
 ENDIF(COMMAND CMAKE_POLICY)
 
 # pass optional build date to compiler
-ADD_DEFINITIONS(-DDCMTK_BUILD_DATE=\\\"2016-11-02\\\")
+ADD_DEFINITIONS(-DDCMTK_BUILD_DATE=\\\"2022-04-22\\\")
 
 # make OFString(NULL) safe by default
 ADD_DEFINITIONS(-DUSE_NULL_SAFE_OFSTRING)
@@ -237,80 +242,80 @@ ELSE(WIN32)
   SET(DCMTK_OVERWRITE_WIN32_COMPILER_FLAGS OFF)
 ENDIF(WIN32)
 
-IF(DCMTK_OVERWRITE_WIN32_COMPILER_FLAGS AND NOT BUILD_SHARED_LIBS)
+# IF(DCMTK_OVERWRITE_WIN32_COMPILER_FLAGS AND NOT BUILD_SHARED_LIBS)
 
-  # settings for Microsoft Visual Studio
-  IF(CMAKE_GENERATOR MATCHES "Visual Studio .*")
-    # get Visual Studio Version
-    STRING(REGEX REPLACE "Visual Studio ([0-9]+).*" "\\1" VS_VERSION "${CMAKE_GENERATOR}")
-    # these settings never change even for C or C++
-    SET(CMAKE_C_FLAGS_DEBUG "/MDd /Z7 /Od")
-    SET(CMAKE_C_FLAGS_RELEASE "/DNDEBUG /MT /O2")
-    SET(CMAKE_C_FLAGS_MINSIZEREL "/DNDEBUG /MT /O2")
-    SET(CMAKE_C_FLAGS_RELWITHDEBINFO "/DNDEBUG /MDd /Z7 /Od")
-    SET(CMAKE_CXX_FLAGS_DEBUG "/MDd /Z7 /Od")
-    SET(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /MT /O2")
-    SET(CMAKE_CXX_FLAGS_MINSIZEREL "/DNDEBUG /MT /O2")
-    SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/DNDEBUG /MDd /Z7 /Od")
-    # specific settings for the various Visual Studio versions
-    IF(VS_VERSION EQUAL 6)
-      SET(CMAKE_C_FLAGS "/nologo /W3 /GX /Gy /YX")
-      SET(CMAKE_CXX_FLAGS "/nologo /W3 /GX /Gy /YX /Zm500") # /Zm500 increments heap size which is needed on some system to compile templates in dcmimgle
-    ENDIF(VS_VERSION EQUAL 6)
-    IF(VS_VERSION EQUAL 7)
-      SET(CMAKE_C_FLAGS "/nologo /W3 /Gy")
-      SET(CMAKE_CXX_FLAGS "/nologo /W3 /Gy")
-    ENDIF(VS_VERSION EQUAL 7)
-    IF(VS_VERSION GREATER 7)
-      SET(CMAKE_C_FLAGS "/nologo /W3 /Gy /EHsc")
-      SET(CMAKE_CXX_FLAGS "/nologo /W3 /Gy /EHsc")
-    ENDIF(VS_VERSION GREATER 7)
-  ENDIF(CMAKE_GENERATOR MATCHES "Visual Studio .*")
+#   # settings for Microsoft Visual Studio
+#   IF(CMAKE_GENERATOR MATCHES "Visual Studio .*")
+#     # get Visual Studio Version
+#     STRING(REGEX REPLACE "Visual Studio ([0-9]+).*" "\\1" VS_VERSION "${CMAKE_GENERATOR}")
+#     # these settings never change even for C or C++
+#     SET(CMAKE_C_FLAGS_DEBUG "/MDd /Z7 /Od")
+#     SET(CMAKE_C_FLAGS_RELEASE "/DNDEBUG /MT /O2")
+#     SET(CMAKE_C_FLAGS_MINSIZEREL "/DNDEBUG /MT /O2")
+#     SET(CMAKE_C_FLAGS_RELWITHDEBINFO "/DNDEBUG /MDd /Z7 /Od")
+#     SET(CMAKE_CXX_FLAGS_DEBUG "/MDd /Z7 /Od")
+#     SET(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /MT /O2")
+#     SET(CMAKE_CXX_FLAGS_MINSIZEREL "/DNDEBUG /MT /O2")
+#     SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/DNDEBUG /MDd /Z7 /Od")
+#     # specific settings for the various Visual Studio versions
+#     IF(VS_VERSION EQUAL 6)
+#       SET(CMAKE_C_FLAGS "/nologo /W3 /GX /Gy /YX")
+#       SET(CMAKE_CXX_FLAGS "/nologo /W3 /GX /Gy /YX /Zm500") # /Zm500 increments heap size which is needed on some system to compile templates in dcmimgle
+#     ENDIF(VS_VERSION EQUAL 6)
+#     IF(VS_VERSION EQUAL 7)
+#       SET(CMAKE_C_FLAGS "/nologo /W3 /Gy")
+#       SET(CMAKE_CXX_FLAGS "/nologo /W3 /Gy")
+#     ENDIF(VS_VERSION EQUAL 7)
+#     IF(VS_VERSION GREATER 7)
+#       SET(CMAKE_C_FLAGS "/nologo /W3 /Gy /EHsc")
+#       SET(CMAKE_CXX_FLAGS "/nologo /W3 /Gy /EHsc")
+#     ENDIF(VS_VERSION GREATER 7)
+#   ENDIF(CMAKE_GENERATOR MATCHES "Visual Studio .*")
 
-  # settings for Borland C++
-  IF(CMAKE_GENERATOR MATCHES "Borland Makefiles")
-    # further settings required? not tested for a very long time!
-    SET(CMAKE_STANDARD_LIBRARIES "import32.lib cw32mt.lib")
-  ENDIF(CMAKE_GENERATOR MATCHES "Borland Makefiles")
+#   # settings for Borland C++
+#   IF(CMAKE_GENERATOR MATCHES "Borland Makefiles")
+#     # further settings required? not tested for a very long time!
+#     SET(CMAKE_STANDARD_LIBRARIES "import32.lib cw32mt.lib")
+#   ENDIF(CMAKE_GENERATOR MATCHES "Borland Makefiles")
 
-ENDIF(DCMTK_OVERWRITE_WIN32_COMPILER_FLAGS AND NOT BUILD_SHARED_LIBS)
+# ENDIF(DCMTK_OVERWRITE_WIN32_COMPILER_FLAGS AND NOT BUILD_SHARED_LIBS)
 
-IF(BUILD_SHARED_LIBS)
-  SET(DCMTK_SHARED ON)
-  IF(BUILD_SINGLE_SHARED_LIBRARY)
-    # We can't build apps, because there is no way to tell CMake to link apps
-    # against the library.
-    SET(BUILD_APPS OFF CACHE BOOL "" FORCE)
-    # We are building static code that can be used in a shared lib
-    SET(DCMTK_BUILD_SINGLE_SHARED_LIBRARY ON)
-    # Make CMake build object libraries. They are just a list of object files
-    # which aren't linked together yet.
-    SET(DCMTK_LIBRARY_TYPE OBJECT)
-    # Static and shared libraries can have dependencies in CMake. Object
-    # libraries cannot. Since CMake saves dependencies in its cache, we have to
-    # make sure that it doesn't get confused when a "normal" library turns into
-    # an object library. Do this via a suffix.
-    SET(DCMTK_LIBRARY_SUFFIX _obj)
-    # This uses object libraries which are new in CMake 2.8.8
-    CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-  ENDIF(BUILD_SINGLE_SHARED_LIBRARY)
+# IF(BUILD_SHARED_LIBS)
+#   SET(DCMTK_SHARED ON)
+#   IF(BUILD_SINGLE_SHARED_LIBRARY)
+#     # We can't build apps, because there is no way to tell CMake to link apps
+#     # against the library.
+#     SET(BUILD_APPS OFF CACHE BOOL "" FORCE)
+#     # We are building static code that can be used in a shared lib
+#     SET(DCMTK_BUILD_SINGLE_SHARED_LIBRARY ON)
+#     # Make CMake build object libraries. They are just a list of object files
+#     # which aren't linked together yet.
+#     SET(DCMTK_LIBRARY_TYPE OBJECT)
+#     # Static and shared libraries can have dependencies in CMake. Object
+#     # libraries cannot. Since CMake saves dependencies in its cache, we have to
+#     # make sure that it doesn't get confused when a "normal" library turns into
+#     # an object library. Do this via a suffix.
+#     SET(DCMTK_LIBRARY_SUFFIX _obj)
+#     # This uses object libraries which are new in CMake 2.8.8
+#     CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+#   ENDIF(BUILD_SINGLE_SHARED_LIBRARY)
 
-  OPTION(USE_COMPILER_HIDDEN_VISIBILITY
-      "Use hidden visibility support if available" ON)
-  MARK_AS_ADVANCED(USE_COMPILER_HIDDEN_VISIBILITY)
+#   OPTION(USE_COMPILER_HIDDEN_VISIBILITY
+#       "Use hidden visibility support if available" ON)
+#   MARK_AS_ADVANCED(USE_COMPILER_HIDDEN_VISIBILITY)
 
-  INCLUDE(CheckCXXCompilerFlag)
-  CHECK_CXX_COMPILER_FLAG("-fvisibility=hidden" GXX_SUPPORTS_VISIBILITY)
-  # This "NOT WIN32" is needed due to a CMake bug that was fixed in
-  # CMake 2.8.x. CHECK_CXX_COMPILER_FLAG() always says "ok" with MSC.
-  IF(GXX_SUPPORTS_VISIBILITY AND USE_COMPILER_HIDDEN_VISIBILITY AND NOT WIN32)
-    SET(HAVE_HIDDEN_VISIBILITY ON)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
-  ELSE(GXX_SUPPORTS_VISIBILITY AND USE_COMPILER_HIDDEN_VISIBILITY AND NOT WIN32)
-    SET(HAVE_HIDDEN_VISIBILITY)
-  ENDIF(GXX_SUPPORTS_VISIBILITY AND USE_COMPILER_HIDDEN_VISIBILITY AND NOT WIN32)
-ENDIF(BUILD_SHARED_LIBS)
+#   INCLUDE(CheckCXXCompilerFlag)
+#   CHECK_CXX_COMPILER_FLAG("-fvisibility=hidden" GXX_SUPPORTS_VISIBILITY)
+#   # This "NOT WIN32" is needed due to a CMake bug that was fixed in
+#   # CMake 2.8.x. CHECK_CXX_COMPILER_FLAG() always says "ok" with MSC.
+#   IF(GXX_SUPPORTS_VISIBILITY AND USE_COMPILER_HIDDEN_VISIBILITY AND NOT WIN32)
+#     SET(HAVE_HIDDEN_VISIBILITY ON)
+#     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+#     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
+#   ELSE(GXX_SUPPORTS_VISIBILITY AND USE_COMPILER_HIDDEN_VISIBILITY AND NOT WIN32)
+#     SET(HAVE_HIDDEN_VISIBILITY)
+#   ENDIF(GXX_SUPPORTS_VISIBILITY AND USE_COMPILER_HIDDEN_VISIBILITY AND NOT WIN32)
+# ENDIF(BUILD_SHARED_LIBS)
 
 IF(WIN32)   # special handling for Windows systems
 
@@ -389,7 +394,7 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 # Third party libraries
 #-----------------------------------------------------------------------------
 
-INCLUDE(${DCMTK_CMAKE_INCLUDE}CMake/3rdparty.cmake)
+# INCLUDE(${DCMTK_CMAKE_INCLUDE}CMake/3rdparty.cmake)
 
 #-----------------------------------------------------------------------------
 # C++11 support
